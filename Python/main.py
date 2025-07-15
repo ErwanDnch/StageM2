@@ -521,7 +521,7 @@ stick_length = [0.3, 0.4, 0.5]
 
 if __name__ == '__main__':
     init = [phi0,om0]          # phi, omega
-    src_directory = "/home/erwan/Master/Stage/SlipFromSim/data/results_U0.24_D0.1_N1024_LEVEL9"
+    src_directory = "FinalCodesStage/Python/data/results_U0.24_D0.1_N1024_LEVEL9"
 
     # rho:0, Cd:1, d:2, L:3, o:4, R:5, pos_cyl:6, dx:7, N:8, Iomega:9, dt:10, mu:11, M:12, up_pos:13, down_pos:14, offx: 15, offy: 16, box_extent: 17
     parameters = [

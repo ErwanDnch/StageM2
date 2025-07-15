@@ -90,9 +90,8 @@ def find_root(muFn, Fp, angle):
             return (angle[up_index] + angle[bot_index]) / 2
 
 
-def main(dfs, out_dir):
+def main(dfs, out_dir, ecc):
     mu_list = [0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.2]
-    ecc = [0.0, 0.01, 0.025, 0.05, 0.075, 0.1, 0.125, 0.15, 0.2]
 
     phi0 = 0
     om0 = 0
@@ -119,8 +118,8 @@ def main(dfs, out_dir):
                 slip_angles.append(val)
 
             df["muFn_wo_in"] = [mu*i for _, i in enumerate(df["f_er_wo_iner"])]
-            ax1.plot(df["phi"], df["muFn"]-df["f_phi"], label=f'e = {ecc[n]/L0:.2f}')
-            ax0.plot(df['t'][:400], df['phi'][:400], label=f'e = {ecc[n]/L0:.2f}')
+            ax1.plot(df["phi"], df["muFn"]-df["f_phi"], label=f'e = {ecc[n]:.3f}')
+            ax0.plot(df['t'][:400], df['phi'][:400], label=f'e = {ecc[n]:.3f}')
 
             ax2.plot(df["phi"], df["f_er_wo_iner"]/df["f_er"])
 
@@ -135,10 +134,10 @@ def main(dfs, out_dir):
         mean_angle = np.mean(slip_angles)
         sliding_angles.append(mean_angle)
 
-        ax0.axhline(0, color='gray', linestyle='-', linewidth=0.5, alpha=0.8, zorder=0)
-        ax1.axhline(0, color='gray', linestyle='-', linewidth=0.5, alpha=0.8, zorder=0)
-        ax1.axvline(mean_angle, color='red', linestyle='-', linewidth=0.5, alpha=0.8, zorder=0)
-        ax2.axvline(mean_angle, color='red', linestyle='-', linewidth=0.5, alpha=0.8, zorder=0)
+        ax0.axhline(0, color='gray', linestyle='-', linewidth=0.5, alpha=1, zorder=0)
+        ax1.axhline(0, color='gray', linestyle='-', linewidth=0.5, alpha=1, zorder=0)
+        ax1.axvline(mean_angle, color='red', linestyle='-', linewidth=0.5, alpha=1, zorder=0)
+        ax2.axvline(mean_angle, color='red', linestyle='-', linewidth=0.5, alpha=1, zorder=0)
 
         ax1.legend()
         #ax0.set_title("Time Evolution of the Difference")
@@ -147,8 +146,8 @@ def main(dfs, out_dir):
         xmin, _ = ax1.get_xlim()
         ax1.set_xlim(xmin, 1 if mean_angle < 0.8 else (mean_angle+0.2 if not np.isnan(mean_angle) else 1.5))
         ax1.minorticks_on()
-        ax1.grid(True, which='minor', linestyle=':', linewidth=0.3, alpha=0.8)
-        ax1.grid(True, which='major', linestyle='-.', linewidth=0.3, alpha=0.8)
+        ax1.grid(True, which='minor', linestyle=':', linewidth=0.4, alpha=1)
+        ax1.grid(True, which='major', linestyle='-.', linewidth=0.5, alpha=1)
 
         ax2.set_ylabel("$F_Rstatic / F_Rdyn$")
         ax2.set_xlabel("Angle (rad)")
@@ -156,8 +155,8 @@ def main(dfs, out_dir):
         ax2.set_xlim(xmin, 1 if mean_angle < 0.8 else (mean_angle+0.2 if not np.isnan(mean_angle) else 1.5))
         ax2.set_ylim(0.8,2)
         ax2.minorticks_on()
-        ax2.grid(True, which='minor', linestyle=':', linewidth=0.3, alpha=0.8)
-        ax2.grid(True, which='major', linestyle='-.', linewidth=0.3, alpha=0.8)
+        ax2.grid(True, which='minor', linestyle=':', linewidth=0.4, alpha=1)
+        ax2.grid(True, which='major', linestyle='-.', linewidth=0.5, alpha=1)
 
 
         #ax1.set_title("Time evolution of the angle $\phi$")
@@ -165,8 +164,8 @@ def main(dfs, out_dir):
         ax0.set_xlabel("Time (s)")
         #ax0.legend()
         ax0.minorticks_on()
-        ax0.grid(True, which='minor', linestyle=':', linewidth=0.3, alpha=0.8)
-        ax0.grid(True, which='major', linestyle='-.', linewidth=0.3, alpha=0.8)
+        ax0.grid(True, which='minor', linestyle=':', linewidth=0.4, alpha=1)
+        ax0.grid(True, which='major', linestyle='-.', linewidth=0.5, alpha=1)
 
         for ax in fig.axes:
             ax.spines['top'].set_visible(False)
@@ -192,6 +191,8 @@ def main(dfs, out_dir):
         name_save = f'plots_mu{mu}_D0.1_Measured.png'
         plt.savefig(os.path.join(out_dir, name_save), bbox_inches='tight', dpi=500)
 
+        plt.close(fig)
+
 
     plt.figure(figsize=(10,3))
     plt.plot(mu_list, sliding_angles)
@@ -211,23 +212,44 @@ def main(dfs, out_dir):
 
     sliding_angles_path = os.path.join(out_dir, "sliding_angles.png")
     plt.savefig(sliding_angles_path)
+    plt.close()
 
 
-source_directory = "/home/erwan/Master/Stage/SlipFromSim/csv_data/U0.24_D0.1_N1024_LEVEL9"
-output_directory = "/home/erwan/Master/Stage/SlipFromSim/Figures/U0p24_D0p1_LEVEL9"
+def sort_f_increasing_ecc(files_list):
+    ecc_list = []
+    tmp_files_list = []
+    for i in files_list:
+        index = i.find("_o")
+        end = i.find("_", 6)
+        if index != -1:
+            ecc_list.append(float(str(i[index+2:end])))
+            tmp_files_list.append(i)
+    
+    paired = sorted(zip(ecc_list, tmp_files_list))
+
+    ecc_list, tmp_files_list = zip(*paired)
+    print("List of eccentricities plotted: ", ecc_list)
+    print("List of files: ", tmp_files_list)
+    return ecc_list, tmp_files_list
+
+
+source_directory = "FinalCodesStage/Python/csv_data/U0.24_D0.1_N1024_LEVEL9"
+output_directory = "FinalCodesStage/Python/Figures/U0p24_D0p1_LEVEL9"
 
 if not os.path.isdir(output_directory):
             os.makedirs(output_directory, exist_ok=True)
 
 for subdir, dirs, files in os.walk(source_directory):
-    print(subdir)
     if subdir == source_directory:
         continue
+    print("Taking files from: ", subdir)
+
     out_dir = os.path.join(output_directory, os.path.basename(subdir))
     if not os.path.isdir(os.path.join(out_dir)):
         os.makedirs(out_dir, exist_ok=True)
-    print(files)
-    print(out_dir)
+    ecc_list, files = sort_f_increasing_ecc(files)
     dfs = [pd.read_csv(os.path.join(subdir,f)) for f in files]
 
-    main(dfs, out_dir)
+    main(dfs, out_dir, ecc_list)
+
+
