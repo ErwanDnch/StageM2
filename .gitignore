@@ -10,6 +10,7 @@
 *.png
 *.mp4
 **/Dumps/
+*.avi
 
 # Ignore test folder
 
