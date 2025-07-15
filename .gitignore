@@ -9,15 +9,17 @@
 
 *.png
 *.mp4
+**/Dumps/
 
 # Ignore test folder
 
-test_figures_anim/
+Python/test_figures_anim/
 
 # Ignore Python cahce
 
-__pycache__/
+**/__pycache__/
 *.pyc
+**/.ipynb_checkpoints/
 
 # Ignore compiled files
 
@@ -26,5 +28,6 @@ __pycache__/
 *.d
 *.test
 *.deps
-main/
-basilisk_files/myibm/.*
+basilisk_files/main/
+basilisk_files/myibm/.[!.]*
+basilisk_files/myibm/..?*
