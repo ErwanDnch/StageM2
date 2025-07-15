@@ -1,0 +1,30 @@
+# Ignore Data Files
+
+*.csv
+*.vtu
+*.pvtu
+*.npy
+
+# Ignore Result Files
+
+*.png
+*.mp4
+
+# Ignore test folder
+
+test_figures_anim/
+
+# Ignore Python cahce
+
+__pycache__/
+*.pyc
+
+# Ignore compiled files
+
+*.s
+*.tst
+*.d
+*.test
+*.deps
+main/
+basilisk_files/myibm/.*
